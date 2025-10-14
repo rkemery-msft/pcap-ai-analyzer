@@ -288,11 +288,11 @@ Priority Actions:
   - Similar pricing to gpt-5-chat but with reasoning tokens
   - **Good compromise between speed and analytical depth**
 
-- **gpt-5-mini** (Alternative): Reasoning model ($0.50 input / $2.00 output per 1M tokens)
+- **gpt-5-mini** (Alternative): Reasoning model ($0.25 input / $2.00 output per 1M tokens)
   - 400K context window (272K input / 128K output)
   - Uses extended reasoning for complex analysis
   - Longer response time (30-90 seconds)
-  - Slightly higher cost due to reasoning tokens
+  - Lower cost than gpt-5-chat (50% less input cost)
   - Excellent for detailed technical deep-dives
   - **Use for specific focus areas** (errors, performance, dns)
 

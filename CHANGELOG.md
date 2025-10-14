@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.0] - 2025-10-14
 
+### Fixed
+- **Corrected gpt-5-mini pricing in README.md**
+  - Updated input pricing from $0.50 to $0.25 per 1M tokens (50% reduction)
+  - Aligned with GPT5_PRICING_REFERENCE.md which had correct pricing
+  - Validated through comprehensive Azure OpenAI testing
+  - Users now have accurate cost information showing gpt-5-mini is 5x cheaper than gpt-5-chat
+  - See `/tmp/pricing-validation-test/PRICING_VALIDATION_REPORT.md` for full analysis
+
 ### Changed
 - Reorganized repository structure for better navigation
   - Moved documentation to `docs/` directory
@@ -14,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated documentation to use clearer language
 - Cleaned up redundant files
 - Updated file path references in README and documentation
+- **Removed gpt-5-pro support** - focused on three core models only (gpt-5-chat, gpt-5, gpt-5-mini)
 
 ### Added
 - **gpt-5 model support** with optimized configuration
