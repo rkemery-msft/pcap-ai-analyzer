@@ -21,11 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Balanced reasoning model between gpt-5-chat (fast) and gpt-5-mini (detailed)
   - Added documentation for gpt-5 usage and pricing
   - Works well with all focus areas
-- **gpt-5-pro documentation** noting it's not currently recommended
-  - Requires responses API (different from chat completions)
-  - Very long processing times (60-120+ seconds)
-  - Limited output visibility in testing
-  - Not implemented in current version
+- **gpt-5-pro model support** (advanced use only)
+  - Implemented using responses API per Microsoft documentation
+  - Uses `max_output_tokens` (32000) and `reasoning.effort: high`
+  - Very long processing times (2-5 minutes typical)
+  - Highest reasoning capability for extremely complex analysis
+  - Significantly higher cost - use sparingly
 
 ### Improved
 - Enhanced reasoning model support (gpt-5, gpt-5-mini, gpt-5-pro)

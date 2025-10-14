@@ -282,8 +282,11 @@ Be specific and reference actual data from the capture."""
         
         print(f"📊 Token estimate: ~{estimated_tokens:,}")
         print(f"💰 Estimated cost: ${estimated_cost:.4f}")
-        print(f"\n🤖 Calling Azure OpenAI ({self.model})...")
-        print("   This may take 30-60 seconds for reasoning models...\n")
+        print(f"🤖 Calling Azure OpenAI ({self.model})...")
+        if 'gpt-5-pro' in self.model:
+            print("   ⚠️  gpt-5-pro may take 2-5 minutes due to extensive reasoning...\n")
+        else:
+            print("   This may take 30-60 seconds for reasoning models...\n")
         
         try:
             # Call Azure OpenAI
@@ -302,23 +305,36 @@ Be specific and reference actual data from the capture."""
                 ]
             }
             
-            # Reasoning models (gpt-5, gpt-5-mini, gpt-5-pro) require max_completion_tokens
-            # and support reasoning_effort parameter for better output quality
-            if 'gpt-5-mini' in self.model or 'gpt-5-pro' in self.model or self.model == 'gpt-5':
-                kwargs["max_completion_tokens"] = 16000  # Increased significantly for reasoning models
-                # Set reasoning_effort to encourage comprehensive visible output
-                # Options: minimal, low, medium, high (default: medium for balance)
-                kwargs["reasoning_effort"] = "medium"  # Balance between speed and quality
-                # Don't set temperature for reasoning models - they handle it internally
+            # Reasoning models (gpt-5, gpt-5-mini, gpt-5-pro) require different configurations
+            # gpt-5-pro uses responses API, others use chat completions
+            if 'gpt-5-pro' in self.model:
+                # gpt-5-pro uses responses API with specific parameters
+                system_msg = kwargs["messages"][0]["content"]
+                user_msg = kwargs["messages"][1]["content"]
+                combined_prompt = f"{system_msg}\n\n{user_msg}"
+                
+                response = self.client.responses.create(
+                    model=kwargs["model"],
+                    input=combined_prompt,
+                    max_output_tokens=32000,
+                    reasoning={"effort": "high"}  # gpt-5-pro only supports high effort
+                )
+            elif 'gpt-5-mini' in self.model or self.model == 'gpt-5':
+                # Other reasoning models use chat completions
+                kwargs["max_completion_tokens"] = 16000
+                kwargs["reasoning_effort"] = "medium"
+                response = self.client.chat.completions.create(**kwargs)
             else:
                 # Chat models use max_tokens and support temperature
-                kwargs["max_tokens"] = 4000  # Increased for detailed analysis
+                kwargs["max_tokens"] = 4000
                 kwargs["temperature"] = 0.7
+                response = self.client.chat.completions.create(**kwargs)
             
-            response = self.client.chat.completions.create(**kwargs)
-            
-            # Extract response
-            content = response.choices[0].message.content
+            # Extract response - different structure for responses API vs chat completions
+            if 'gpt-5-pro' in self.model:
+                content = response.output_text if hasattr(response, 'output_text') else ""
+            else:
+                content = response.choices[0].message.content
             
             # Handle reasoning models that might not return visible content
             if not content or content.strip() == "":
