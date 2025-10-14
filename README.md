@@ -265,36 +265,44 @@ Priority Actions:
 
 ### Azure OpenAI GPT-5 Pricing (Global Deployment)
 
-| File Size | Tokens | gpt-5-chat Cost |
-|-----------|--------|-----------------|
-| 100 MB    | ~2,000 | **$0.0025** |
-| 500 MB    | ~7,000 | **$0.0094** |
-| 1 GB      | ~13,000| **$0.0175** |
-| 5 GB      | ~35,000 | **$0.0938** |
+**Cost Comparison (typical 3K input + 2K output tokens):**
+
+| Model | Input Cost | Output Cost | Total Cost | Notes |
+|-------|------------|-------------|------------|-------|
+| **gpt-5-chat** | $0.00375 | $0.02000 | **$0.02375** | Fast, no reasoning |
+| **gpt-5** | $0.00375 | $0.02000 | **$0.02375** | Reasoning, same cost |
+| **gpt-5-mini** | $0.00075 | $0.00400 | **$0.00475** | Reasoning, 5x cheaper |
+
+**Cost by PCAP Size:**
+
+| File Size | Approx Tokens | gpt-5-chat | gpt-5 | gpt-5-mini |
+|-----------|---------------|------------|-------|------------|
+| 100 MB    | ~2,000 | $0.0025 | $0.0025 | $0.0005 |
+| 500 MB    | ~7,000 | $0.0094 | $0.0094 | $0.0019 |
+| 1 GB      | ~13,000 | $0.0175 | $0.0175 | $0.0035 |
+| 5 GB      | ~35,000 | $0.0938 | $0.0938 | $0.0188 |
 
 **Model Information:**
 
-- **gpt-5-chat** (Recommended): Standard chat model ($1.25 input / $10.00 output per 1M tokens)
+- **gpt-5-chat**: Standard chat model ($1.25 input / $10.00 output per 1M tokens)
   - 128K context window, 16K max output tokens
-  - Consistent, reliable output across all scenarios
+  - No reasoning capabilities (direct responses)
   - Fast response time (typically 10-30 seconds, varies by workload)
-  - Cost-effective at ~$0.001-$0.01 per typical capture
-  - **Recommended for production PCAP analysis** (optimal speed/cost balance)
+  - Best for: Quick analysis where speed matters
 
-- **gpt-5** (Balanced): Reasoning model ($1.25 input / $10.00 output per 1M tokens)
-  - 400K context window (272K input / 128K output)
-  - Full reasoning capabilities (same as gpt-5-mini)
-  - Medium response time (30-60 seconds, varies by workload)
-  - Similar pricing to gpt-5-chat but with reasoning tokens
-  - **Good compromise between speed and analytical depth**
-
-- **gpt-5-mini** (Alternative): Reasoning model ($0.25 input / $2.00 output per 1M tokens)
+- **gpt-5**: Reasoning model ($1.25 input / $10.00 output per 1M tokens)
   - 400K context window (272K input / 128K output), 128K max output tokens
-  - Uses extended reasoning for complex analysis
-  - Longer response time (30-90 seconds, varies by workload)
-  - Lower cost than gpt-5-chat (5x cheaper for same token usage)
-  - Excellent for detailed technical deep-dives
-  - **Use for specific focus areas** (errors, performance, dns)
+  - Full reasoning capabilities (identical to gpt-5-mini)
+  - Adjustable reasoning_effort: minimal, low, medium, high
+  - Response time varies by reasoning_effort setting (30-60+ seconds)
+  - Best for: Complex analysis where reasoning helps, same cost as gpt-5-chat
+
+- **gpt-5-mini**: Reasoning model ($0.25 input / $2.00 output per 1M tokens)
+  - 400K context window (272K input / 128K output), 128K max output tokens
+  - Full reasoning capabilities (identical to gpt-5)
+  - Adjustable reasoning_effort: minimal, low, medium, high
+  - Response time varies by reasoning_effort setting (similar to gpt-5)
+  - Best for: Budget-conscious deployments, batch processing (5x cheaper than others)
 
 **Important Notes:** 
 - Costs shown are for AI analysis only using Global deployment (East US pricing)
@@ -377,7 +385,7 @@ Priority Actions:
 ## 🎯 Use Cases
 
 ### DevOps / SRE
-- **Incident Response**: Quickly identify root causes in production outages
+- **Incident Response**: Quickly identify root causes in outages
 - **Performance Tuning**: Detect network bottlenecks and optimization opportunities
 - **Capacity Planning**: Analyze traffic patterns and growth trends
 

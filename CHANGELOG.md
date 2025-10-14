@@ -19,10 +19,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Users now have accurate cost information showing gpt-5-mini is 5x cheaper than gpt-5-chat
   - See `docs/PRICING_VALIDATION_REPORT.md` for full analysis
 - **Improved accuracy of model capability descriptions**
-  - Changed gpt-5 from "moderate reasoning" to "full reasoning capabilities"
-  - Added disclaimers that response times vary by workload
-  - Clarified that gpt-5 and gpt-5-mini have identical reasoning capabilities
-  - Updated "best for production" to "recommended for production PCAP analysis"
+  - Removed inaccurate "extended reasoning" claim for gpt-5-mini
+  - Corrected: gpt-5 and gpt-5-mini have **identical reasoning capabilities**
+  - Microsoft docs confirm: "absolute latency and cost scale down with mini and nano but the tradeoffs are the same"
+  - Both support same reasoning_effort levels: minimal, low, medium, high
+  - Main differences are cost (5x) and training data date, NOT reasoning depth
+  - Added comprehensive pricing table showing all three models
+  - Removed subjective "production" and "deep-dive excellence" claims
+  - Added disclaimers that response times vary by reasoning_effort and workload
 
 ### Changed
 - Reorganized repository structure for better navigation

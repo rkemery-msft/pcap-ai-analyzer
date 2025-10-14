@@ -216,10 +216,10 @@ python sanitize_pcap.py --input capture.cap
 
 ### Model Selection
 
-**Recommended Model:**
-- `gpt-5-chat` (128K context) - Fast, reliable output, recommended for production
-- `gpt-5` (400K context) - Full reasoning model (balanced speed/depth)
-- `gpt-5-mini` (400K context) - Cost-effective reasoning model (5x cheaper than gpt-5-chat)
+**Model Selection:**
+- `gpt-5-chat` (128K context) - Fast, no reasoning (best for speed)
+- `gpt-5` (400K context) - Full reasoning model (same cost as chat, slower)
+- `gpt-5-mini` (400K context) - Full reasoning model (5x cheaper, similar speed to gpt-5)
 
 ## Quick Reference
 
