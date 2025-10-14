@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-10-14
+
+### Changed
+- Reorganized repository structure for better navigation
+  - Moved documentation to `docs/` directory
+  - Moved tests to `tests/` directory
+- Updated documentation to use clearer language
+- Cleaned up redundant files
+- Updated file path references in README and documentation
+
+### Removed
+- Redundant testing report files
+
 ## [1.0.0] - 2025-10-13
 
 ### Added
@@ -41,14 +54,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Example outputs and analysis samples
 
 ### Features
-- 🔒 Complete PII sanitization while preserving traffic patterns
-- 📊 Automated error detection and classification
-- 🤖 AI-powered root cause analysis with actionable recommendations
-- 💰 Cost-efficient analysis ($0.001-$0.031 per 500MB file depending on model)
-- 🎯 Kubernetes/AKS-optimized error detection
-- 📈 Compression ratio of ~100,000:1 (500MB → 5KB)
-- 🔧 Command-line interface with comprehensive options
-- 📝 Well-documented with examples and guides
+- 🔒 PII sanitization while preserving traffic patterns
+- 📊 Error detection and classification
+- 🤖 AI-powered root cause analysis with recommendations
+- 💰 Cost-efficient analysis ($0.001-$0.031 per 500MB file)
+- 🎯 Works well with Kubernetes/AKS captures
+- 📈 Data compression (~100,000:1 ratio)
+- 🔧 Command-line interface with options
+- 📝 Documentation with examples and guides
 
 ### Technical Details
 - Python 3.8+ compatibility

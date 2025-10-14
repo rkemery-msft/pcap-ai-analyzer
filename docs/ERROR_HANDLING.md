@@ -2,7 +2,7 @@
 
 ## Overview
 
-All three tools in the pcap-ai-analyzer suite have comprehensive error handling to gracefully handle various failure scenarios. This document describes all error types, their meanings, and troubleshooting steps.
+The pcap-ai-analyzer tools include error handling for common failure scenarios. This document describes error types, their meanings, and troubleshooting steps.
 
 ## Exit Codes
 
@@ -359,14 +359,14 @@ Pay attention to warnings - they may indicate data quality issues:
 
 ## Testing Error Handling
 
-A comprehensive test suite is included:
+A test suite is included:
 
 ```bash
-cd /home/rick/pcap-ai-analyzer
-./test_error_scenarios.sh
+cd pcap-ai-analyzer
+./tests/test_error_scenarios.sh
 ```
 
-This tests all 23 error scenarios to ensure robust error handling.
+This tests common error scenarios.
 
 ## Getting Help
 
@@ -377,13 +377,13 @@ If you encounter an error not documented here:
 3. Include the full error message when seeking help
 4. Note your environment (OS, Python version, file size)
 
-## Error Handling Philosophy
+## Error Handling Approach
 
 The tools follow these principles:
 
-1. **Fail Fast**: Detect errors early before processing
+1. **Early Detection**: Check for errors before processing
 2. **Clear Messages**: Explain what went wrong and how to fix it
-3. **Proper Exit Codes**: Enable scripting and automation
-4. **Graceful Degradation**: Continue processing when possible (e.g., skip bad packets)
+3. **Standard Exit Codes**: Enable scripting and automation
+4. **Continue When Possible**: Skip problematic packets when feasible
 5. **Clean Interruption**: Handle Ctrl+C without leaving partial files
-6. **Defensive Programming**: Validate all inputs before processing
+6. **Input Validation**: Validate inputs before processing

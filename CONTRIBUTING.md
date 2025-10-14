@@ -100,16 +100,16 @@ def analyze_packet(packet: Packet, analyzer: PacketAnalyzer) -> AnalysisResult:
 - Update examples if changing CLI
 - Add comments for complex logic
 
-## 🎯 Priority Areas
+## 🎯 Areas for Contribution
 
-We especially welcome contributions in:
-- [ ] Support for additional AI providers (OpenAI, Anthropic)
-- [ ] Real-time packet capture analysis
-- [ ] Web UI for visualization
-- [ ] Docker containerization
-- [ ] Additional error detection patterns
-- [ ] Performance optimizations
-- [ ] Better test coverage
+Contributions welcome in:
+- Support for additional AI providers (OpenAI, Anthropic)
+- Real-time packet capture analysis
+- Web UI for visualization
+- Docker containerization
+- Additional error detection patterns
+- Performance optimizations
+- Test coverage improvements
 
 ## 🏗️ Development Setup
 

@@ -1,18 +1,18 @@
 # 🔍 PCAP AI Analyzer
 
-AI-powered network packet capture analyzer for Kubernetes/Azure networking. Sanitizes sensitive data, detects TCP/DNS/HTTP errors, and uses Azure OpenAI to provide root cause analysis and actionable troubleshooting steps.
+AI-powered network packet capture analyzer for troubleshooting network issues. Sanitizes sensitive data, detects errors, and uses Azure OpenAI to provide root cause analysis and actionable recommendations.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)]
 
 ## 🎯 Features
 
 - **🔒 PII Sanitization**: Anonymizes IP addresses, MAC addresses, DNS queries, HTTP headers, emails, and API keys
-- **📊 Error Detection**: Automatically identifies TCP resets, retransmissions, DNS failures, HTTP errors, and connection issues
-- **🤖 AI Analysis**: Uses Azure OpenAI GPT-5 models to provide expert-level root cause analysis
-- **💰 Cost-Efficient**: Reduces 500MB PCAP files to ~5KB of structured data ($0.001-$0.031 per analysis depending on GPT-5 model)
-- **🎯 Kubernetes-Optimized**: Specialized detection for AKS/K8s networking issues
-- **📈 Actionable Insights**: Generates prioritized troubleshooting steps with evidence
+- **📊 Error Detection**: Identifies TCP resets, retransmissions, DNS failures, HTTP errors, and connection issues
+- **🤖 AI Analysis**: Uses Azure OpenAI GPT-5 models for root cause analysis
+- **💰 Cost-Efficient**: Reduces 500MB PCAP files to ~5KB of structured data
+- **🎯 Kubernetes Support**: Works well with AKS/K8s networking captures
+- **📈 Actionable Insights**: Generates troubleshooting recommendations with evidence
 
 ## ⚠️ Security & Privacy Disclaimer
 
@@ -37,7 +37,7 @@ AI-powered network packet capture analyzer for Kubernetes/Azure networking. Sani
 4. **Combine with organizational security policies** (access controls, encryption at rest)
 5. **Document your review process** for audit trails
 
-📋 **Detailed Testing:** See [SANITIZATION_TEST_REPORT.md](./SANITIZATION_TEST_REPORT.md) for accuracy validation results.
+📋 **Detailed Testing:** See [SANITIZATION_TEST_REPORT.md](./docs/SANITIZATION_TEST_REPORT.md) for accuracy validation results.
 
 **Recommended Use:** Internal troubleshooting, team collaboration, support cases (with review)  
 **Requires Extra Review:** External vendor sharing, compliance-regulated data, public release
@@ -173,7 +173,7 @@ AZURE_OPENAI_API_VERSION=2024-02-01
 GPT_5_CHAT_MODEL=gpt-5-chat    # Your chat model deployment name
 ```
 
-**Model Information:** GPT-5 is an advanced reasoning model series from Azure OpenAI. The `gpt-5-chat` model (128K context) is optimized for conversational tasks and detailed analysis, providing excellent quality for PCAP analysis. Use the deployment name configured in your Azure OpenAI resource.
+**Model Information:** GPT-5 is an advanced reasoning model series from Azure OpenAI. The `gpt-5-chat` model (128K context) is optimized for conversational tasks and detailed analysis. Use the deployment name configured in your Azure OpenAI resource.
 
 ### Advanced Options
 
@@ -260,8 +260,7 @@ Priority Actions:
 **Model Information:**
 - **gpt-5-chat**: Recommended model ($1.25 input / $10.00 output per 1M tokens)
   - 128K context window
-  - Excellent analysis quality with detailed narratives
-  - Reliable output for complex PCAP analysis
+  - Provides detailed analysis with narratives
   - Cost-effective at ~$0.001-$0.01 per typical capture
 
 **Important Notes:** 
@@ -269,8 +268,8 @@ Priority Actions:
 - Sanitization and preparation are free (local processing)
 - Data Zone deployments add ~10% to costs
 - Cached input pricing (90% discount) available for repeated analyses
-- See [GPT5_PRICING_REFERENCE.md](GPT5_PRICING_REFERENCE.md) for detailed calculations
-- Source: [Azure OpenAI Pricing](https://azure.microsoft.com/pricing/details/cognitive-services/openai-service/) (October 2025)
+- See [GPT5_PRICING_REFERENCE.md](docs/GPT5_PRICING_REFERENCE.md) for detailed calculations
+- Source: [Azure OpenAI Pricing](https://azure.microsoft.com/pricing/details/cognitive-services/openai-service/)
 
 ## 🏗️ Architecture
 
@@ -387,7 +386,7 @@ pip install scapy
 
 **"AI model returns no content"**
 - Some reasoning models may not return visible output consistently
-- Use `--model gpt-5-chat` for guaranteed visible responses (recommended) (recommended)
+- Use `--model gpt-5-chat` for consistent responses (recommended)
 - Reduce prompt complexity with `--focus errors` or `--focus dns`
 
 ### Virtual Environment Creation Fails
@@ -419,10 +418,10 @@ GPT_5_CHAT_MODEL=gpt-5-chat
 
 ## 📚 Documentation
 
-- [Installation Guide](docs/INSTALLATION.md)
-- [Configuration Reference](docs/CONFIGURATION.md)
-- [API Documentation](docs/API.md)
-- [Troubleshooting Guide](docs/TROUBLESHOOTING.md)
+- [Quick Start Guide](docs/QUICKSTART.md)
+- [Error Handling Reference](docs/ERROR_HANDLING.md)
+- [Sanitization Test Report](docs/SANITIZATION_TEST_REPORT.md)
+- [Pricing Reference](docs/GPT5_PRICING_REFERENCE.md)
 - [Contributing Guidelines](CONTRIBUTING.md)
 
 ## 🤝 Contributing
