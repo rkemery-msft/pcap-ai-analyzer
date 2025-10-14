@@ -51,15 +51,45 @@ class PCAPAnalysisPrep:
         self.tcp_seq_track = defaultdict(set)  # Track TCP sequences for retransmission detection
         
     def load_packets(self):
-        """Load packets from PCAP file"""
+        """Load packets from PCAP file with comprehensive error handling"""
         print(f"Loading PCAP file: {self.pcap_file}")
+        
         try:
+            # Validate file before attempting to read
+            if not os.path.exists(self.pcap_file):
+                raise FileNotFoundError(f"PCAP file not found: {self.pcap_file}")
+            
+            if not os.access(self.pcap_file, os.R_OK):
+                raise PermissionError(f"Cannot read PCAP file: {self.pcap_file}")
+            
+            # Attempt to read PCAP
             self.packets = rdpcap(self.pcap_file)
             self.stats['total_packets'] = len(self.packets)
-            print(f"Loaded {len(self.packets)} packets")
+            
+            if len(self.packets) == 0:
+                raise ValueError("PCAP file contains no packets")
+            
+            print(f"✓ Loaded {len(self.packets):,} packets")
+            
+        except FileNotFoundError as e:
+            raise FileNotFoundError(f"PCAP file not found: {self.pcap_file}") from e
+        except PermissionError as e:
+            raise PermissionError(f"Cannot read PCAP file (permission denied): {self.pcap_file}") from e
+        except ValueError as e:
+            if "Not a supported capture file" in str(e) or "unknown file format" in str(e):
+                raise ValueError(f"Invalid or corrupted PCAP file format: {self.pcap_file}") from e
+            raise
+        except MemoryError:
+            raise MemoryError(f"File too large to load into memory: {self.pcap_file}") from None
         except Exception as e:
-            print(f"Error loading PCAP: {e}")
-            sys.exit(1)
+            # Catch any other scapy-related errors
+            error_msg = str(e).lower()
+            if "truncated" in error_msg or "premature end" in error_msg:
+                raise ValueError(f"Corrupted or truncated PCAP file: {self.pcap_file}") from e
+            elif "permission" in error_msg:
+                raise PermissionError(f"Cannot read PCAP file: {self.pcap_file}") from e
+            else:
+                raise RuntimeError(f"Failed to load PCAP file: {e}") from e
     
     def analyze_packet(self, pkt, pkt_num):
         """Analyze a single packet for errors and anomalies"""
@@ -509,32 +539,132 @@ Examples:
         help='Output directory for analysis files (default: ai_analysis/)'
     )
     
-    args = parser.parse_args()
+    try:
+        args = parser.parse_args()
+    except SystemExit:
+        sys.exit(1)
     
     pcap_file = args.input
     output_dir = args.output_dir
     
-    if not os.path.exists(pcap_file):
-        print(f"Error: PCAP file not found: {pcap_file}")
+    try:
+        # Validate input file
+        if not pcap_file:
+            print("❌ Error: No input file specified", file=sys.stderr)
+            sys.exit(1)
+            
+        if not os.path.exists(pcap_file):
+            print(f"❌ Error: PCAP file not found: {pcap_file}", file=sys.stderr)
+            sys.exit(1)
+            
+        if not os.access(pcap_file, os.R_OK):
+            print(f"❌ Error: Cannot read PCAP file (permission denied): {pcap_file}", file=sys.stderr)
+            sys.exit(1)
+            
+        # Check file size
+        file_size = os.path.getsize(pcap_file)
+        if file_size == 0:
+            print(f"❌ Error: Input file is empty (0 bytes): {pcap_file}", file=sys.stderr)
+            sys.exit(1)
+        
+        # Validate output directory path
+        if not output_dir:
+            print("❌ Error: No output directory specified", file=sys.stderr)
+            sys.exit(1)
+            
+        # Check if output directory parent exists and is writable
+        parent_dir = os.path.dirname(os.path.abspath(output_dir)) if os.path.dirname(output_dir) else '.'
+        if not os.path.exists(parent_dir):
+            print(f"❌ Error: Parent directory does not exist: {parent_dir}", file=sys.stderr)
+            sys.exit(1)
+            
+        if not os.access(parent_dir, os.W_OK):
+            print(f"❌ Error: Cannot write to parent directory (permission denied): {parent_dir}", file=sys.stderr)
+            sys.exit(1)
+        
+        # Display header
+        print("="*60)
+        print("PCAP TO AI-OPTIMIZED ANALYSIS")
+        print("="*60)
+        print(f"Input: {pcap_file}")
+        print(f"Size: {file_size / (1024*1024):.2f} MB")
+        print(f"Output: {output_dir}/")
+        print()
+        
+        # Initialize analyzer
+        try:
+            analyzer = PCAPAnalysisPrep(pcap_file)
+        except Exception as e:
+            print(f"❌ Error: Failed to initialize analyzer: {e}", file=sys.stderr)
+            sys.exit(1)
+        
+        # Load and analyze packets
+        try:
+            print("Loading packets...")
+            analyzer.load_packets()
+            
+            if analyzer.stats['total_packets'] == 0:
+                print(f"❌ Error: No valid packets found in PCAP file: {pcap_file}", file=sys.stderr)
+                sys.exit(1)
+                
+            print("Analyzing packets...")
+            analyzer.analyze_all()
+            
+        except MemoryError:
+            print(f"❌ Error: Out of memory while processing PCAP file (file too large)", file=sys.stderr)
+            print(f"   Try splitting the file into smaller chunks using 'editcap'", file=sys.stderr)
+            sys.exit(1)
+        except Exception as e:
+            print(f"❌ Error: Failed to analyze PCAP: {e}", file=sys.stderr)
+            import traceback
+            traceback.print_exc()
+            sys.exit(1)
+        
+        # Export analysis
+        try:
+            print("Exporting analysis...")
+            analyzer.export_analysis(output_dir)
+            print("\n✅ Analysis complete!")
+            sys.exit(0)
+            
+        except PermissionError as e:
+            print(f"❌ Error: Cannot write to output directory (permission denied): {output_dir}", file=sys.stderr)
+            sys.exit(1)
+        except OSError as e:
+            if "No space left" in str(e) or "Disk quota exceeded" in str(e):
+                print(f"❌ Error: No disk space available: {e}", file=sys.stderr)
+            else:
+                print(f"❌ Error: Failed to write output files: {e}", file=sys.stderr)
+            sys.exit(1)
+        except Exception as e:
+            print(f"❌ Error: Failed to export analysis: {e}", file=sys.stderr)
+            import traceback
+            traceback.print_exc()
+            sys.exit(1)
+            
+    except KeyboardInterrupt:
+        print("\n\n❌ Operation cancelled by user", file=sys.stderr)
+        # Clean up partial output directory if it was created
+        if os.path.exists(output_dir) and os.path.isdir(output_dir):
+            try:
+                import shutil
+                shutil.rmtree(output_dir)
+                print(f"Cleaned up partial output directory: {output_dir}", file=sys.stderr)
+            except:
+                pass
+        sys.exit(130)
+    except Exception as e:
+        print(f"❌ Unexpected error: {e}", file=sys.stderr)
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
-    
-    print("="*60)
-    print("PCAP TO AI-OPTIMIZED ANALYSIS")
-    print("="*60)
-    print(f"Input: {pcap_file}")
-    print(f"Output: {output_dir}/")
-    print()
-    
-    # Initialize analyzer
-    analyzer = PCAPAnalysisPrep(pcap_file)
-    
-    # Load and analyze
-    analyzer.load_packets()
-    analyzer.analyze_all()
-    
-    # Export for AI
-    analyzer.export_analysis(output_dir)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except SystemExit:
+        raise
+    except Exception as e:
+        print(f"❌ Fatal error: {e}", file=sys.stderr)
+        sys.exit(1)

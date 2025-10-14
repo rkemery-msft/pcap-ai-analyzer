@@ -264,25 +264,92 @@ class PCAPSanitizer:
         return packet
     
     def sanitize_file(self, input_file, output_file):
-        """Sanitize entire PCAP file"""
-        print(f"Reading PCAP file: {input_file}")
-        print("This may take a while for large files...")
-        
+        """Sanitize entire PCAP file with comprehensive error handling"""
         try:
-            packets = rdpcap(input_file)
+            # Validate input file exists
+            if not os.path.exists(input_file):
+                raise FileNotFoundError(f"Input file not found: {input_file}")
+            
+            # Check if input file is readable
+            if not os.access(input_file, os.R_OK):
+                raise PermissionError(f"Cannot read input file (permission denied): {input_file}")
+            
+            # Check file size
+            file_size_mb = os.path.getsize(input_file) / (1024*1024)
+            if file_size_mb == 0:
+                raise ValueError("Input file is empty (0 bytes)")
+            
+            # Check if output directory is writable
+            output_dir = os.path.dirname(output_file) or '.'
+            if not os.access(output_dir, os.W_OK):
+                raise PermissionError(f"Cannot write to output directory (permission denied): {output_dir}")
+            
+            print(f"Reading PCAP file: {input_file}")
+            print("This may take a while for large files...")
+            
+            # Read PCAP file with error handling
+            try:
+                packets = rdpcap(input_file)
+            except FileNotFoundError as e:
+                raise FileNotFoundError(f"PCAP file not found: {input_file}")
+            except PermissionError as e:
+                raise PermissionError(f"Permission denied reading PCAP: {input_file}")
+            except Exception as e:
+                error_msg = str(e)
+                if "not a supported capture file" in error_msg.lower() or "truncated" in error_msg.lower():
+                    raise ValueError(f"Invalid or corrupted PCAP file: {input_file} ({error_msg})")
+                raise ValueError(f"Failed to read PCAP file: {error_msg}")
+            
+            if not packets or len(packets) == 0:
+                raise ValueError(f"No packets found in PCAP file: {input_file}")
+            
             print(f"Loaded {len(packets)} packets")
             
+            # Sanitize packets with progress tracking
             sanitized_packets = []
+            errors_encountered = 0
+            max_errors = 100  # Stop if too many errors
+            
             for i, packet in enumerate(packets):
                 if i % 1000 == 0:
                     print(f"Processing packet {i}/{len(packets)}...")
                 
-                sanitized_packet = self.sanitize_packet(packet)
-                sanitized_packets.append(sanitized_packet)
+                try:
+                    sanitized_packet = self.sanitize_packet(packet)
+                    sanitized_packets.append(sanitized_packet)
+                except Exception as e:
+                    errors_encountered += 1
+                    if errors_encountered <= 10:  # Only print first 10 errors
+                        print(f"Warning: Failed to sanitize packet {i}: {e}")
+                    if errors_encountered >= max_errors:
+                        raise RuntimeError(f"Too many errors encountered ({errors_encountered}). Stopping sanitization.")
+                    # Skip the problematic packet
+                    continue
             
+            if not sanitized_packets:
+                raise ValueError("No packets could be successfully sanitized")
+            
+            if errors_encountered > 0:
+                print(f"\nWarning: {errors_encountered} packets could not be sanitized and were skipped")
+            
+            # Write output file with error handling
             print(f"\nWriting sanitized PCAP to: {output_file}")
-            wrpcap(output_file, sanitized_packets)
+            try:
+                wrpcap(output_file, sanitized_packets)
+            except PermissionError:
+                raise PermissionError(f"Permission denied writing output file: {output_file}")
+            except OSError as e:
+                if "No space left" in str(e) or "Disk quota exceeded" in str(e):
+                    raise OSError(f"Insufficient disk space to write output file: {output_file}")
+                raise OSError(f"Failed to write output file: {e}")
             
+            # Verify output file was created successfully
+            if not os.path.exists(output_file):
+                raise IOError(f"Output file was not created: {output_file}")
+            
+            output_size_mb = os.path.getsize(output_file) / (1024*1024)
+            
+            # Print completion statistics
             print("\n" + "="*60)
             print("SANITIZATION COMPLETE")
             print("="*60)
@@ -294,11 +361,37 @@ class PCAPSanitizer:
             print(f"TLS data sanitized: {self.stats['tls_sanitized']}")
             print(f"Sensitive data removed: {self.stats['sensitive_data_removed']}")
             print(f"\nOutput file: {output_file}")
-            print(f"Output size: {os.path.getsize(output_file) / (1024*1024):.2f} MB")
+            print(f"Output size: {output_size_mb:.2f} MB")
+            print("="*60)
             
+            return True
+            
+        except FileNotFoundError as e:
+            print(f"\n❌ Error: {e}", file=sys.stderr)
+            return False
+        except PermissionError as e:
+            print(f"\n❌ Error: {e}", file=sys.stderr)
+            return False
+        except ValueError as e:
+            print(f"\n❌ Error: {e}", file=sys.stderr)
+            return False
+        except OSError as e:
+            print(f"\n❌ Error: {e}", file=sys.stderr)
+            return False
+        except KeyboardInterrupt:
+            print(f"\n\n❌ Operation cancelled by user", file=sys.stderr)
+            if os.path.exists(output_file):
+                print(f"Removing incomplete output file: {output_file}")
+                try:
+                    os.remove(output_file)
+                except:
+                    pass
+            return False
         except Exception as e:
-            print(f"Error processing PCAP file: {e}")
-            sys.exit(1)
+            print(f"\n❌ Unexpected error during sanitization: {e}", file=sys.stderr)
+            import traceback
+            traceback.print_exc()
+            return False
 
 
 def main():
@@ -362,25 +455,58 @@ Examples:
     
     preserve_ips = args.preserve_private_ips and not args.no_preserve_private_ips
     
-    print("="*60)
-    print("PCAP SANITIZATION TOOL")
-    print("="*60)
-    print(f"Input file: {input_file}")
-    print(f"Input size: {os.path.getsize(input_file) / (1024*1024):.2f} MB")
-    print(f"Output file: {output_file}")
-    print(f"Preserve private IPs: {preserve_ips}")
-    print("\nThis will anonymize:")
-    print("  - IP addresses (public and private)")
-    print("  - MAC addresses")
-    print("  - DNS queries and responses")
-    print("  - HTTP headers (cookies, auth, user-agent)")
-    print("  - Email addresses")
-    print("  - API keys and tokens")
-    print("\n")
-    
-    sanitizer = PCAPSanitizer(preserve_internal_ips=preserve_ips)
-    sanitizer.sanitize_file(input_file, output_file)
+    try:
+        # Display tool header
+        print("="*60)
+        print("PCAP SANITIZATION TOOL")
+        print("="*60)
+        print(f"Input file: {input_file}")
+        
+        # Check file size with error handling
+        try:
+            file_size = os.path.getsize(input_file) / (1024*1024)
+            print(f"Input size: {file_size:.2f} MB")
+        except OSError as e:
+            print(f"Error: Cannot access input file: {e}", file=sys.stderr)
+            sys.exit(1)
+        
+        print(f"Output file: {output_file}")
+        print(f"Preserve private IPs: {preserve_ips}")
+        print("\nThis will anonymize:")
+        print("  - IP addresses (public and private)")
+        print("  - MAC addresses")
+        print("  - DNS queries and responses")
+        print("  - HTTP headers (cookies, auth, user-agent)")
+        print("  - Email addresses")
+        print("  - API keys and tokens")
+        print("\n")
+        
+        # Perform sanitization
+        sanitizer = PCAPSanitizer(preserve_internal_ips=preserve_ips)
+        success = sanitizer.sanitize_file(input_file, output_file)
+        
+        # Exit with appropriate code
+        if success:
+            sys.exit(0)
+        else:
+            print("\n❌ Sanitization failed. Please check the error messages above.", file=sys.stderr)
+            sys.exit(1)
+            
+    except KeyboardInterrupt:
+        print("\n\n❌ Operation cancelled by user", file=sys.stderr)
+        sys.exit(130)  # Standard exit code for Ctrl+C
+    except Exception as e:
+        print(f"\n❌ Unexpected error: {e}", file=sys.stderr)
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except SystemExit:
+        raise
+    except Exception as e:
+        print(f"\n❌ Fatal error: {e}", file=sys.stderr)
+        sys.exit(1)

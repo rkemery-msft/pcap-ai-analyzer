@@ -22,12 +22,57 @@ class PCAPAIAnalyzer:
     """AI-powered PCAP analysis using Azure OpenAI"""
     
     def __init__(self, analysis_dir: str, model_override: str = None):
-        """Initialize the analyzer"""
+        """Initialize the analyzer with comprehensive error handling"""
+        
+        # Validate analysis directory
+        if not analysis_dir:
+            raise ValueError("Analysis directory path cannot be empty")
+        
         self.analysis_dir = Path(analysis_dir)
+        
+        if not self.analysis_dir.exists():
+            raise FileNotFoundError(f"Analysis directory not found: {analysis_dir}")
+        
+        if not self.analysis_dir.is_dir():
+            raise NotADirectoryError(f"Path is not a directory: {analysis_dir}")
+        
+        if not os.access(self.analysis_dir, os.R_OK):
+            raise PermissionError(f"Cannot read analysis directory (permission denied): {analysis_dir}")
+        
+        # Check for required analysis files
+        required_files = ['summary.json', 'errors_detailed.json']
+        missing_files = []
+        for filename in required_files:
+            filepath = self.analysis_dir / filename
+            if not filepath.exists():
+                missing_files.append(filename)
+        
+        if missing_files:
+            raise FileNotFoundError(
+                f"Missing required analysis files in {analysis_dir}: {', '.join(missing_files)}\n"
+                f"Run 'prepare_for_ai_analysis.py' first to generate these files."
+            )
         
         # Initialize Azure OpenAI client
         self.endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
         self.api_key = os.getenv("AZURE_OPENAI_API_KEY")
+        
+        # Validate credentials
+        if not self.endpoint:
+            raise ValueError(
+                "Azure OpenAI endpoint not found.\n"
+                "Set AZURE_OPENAI_ENDPOINT environment variable or add to .env file"
+            )
+        
+        if not self.api_key:
+            raise ValueError(
+                "Azure OpenAI API key not found.\n"
+                "Set AZURE_OPENAI_API_KEY environment variable or add to .env file"
+            )
+        
+        # Validate endpoint format
+        if not self.endpoint.startswith(('http://', 'https://')):
+            raise ValueError(f"Invalid endpoint URL format: {self.endpoint}")
         
         # Allow model override or use GPT_5_CHAT_MODEL by default (better for analysis)
         if model_override:
@@ -35,13 +80,14 @@ class PCAPAIAnalyzer:
         else:
             self.model = os.getenv("GPT_5_CHAT_MODEL", "gpt-5-chat")
         
-        if not self.endpoint or not self.api_key:
-            raise ValueError("Azure OpenAI credentials not found. Check .env file.")
-        
-        self.client = OpenAI(
-            api_key=self.api_key,
-            base_url=f"{self.endpoint}/openai/v1/"
-        )
+        # Initialize OpenAI client
+        try:
+            self.client = OpenAI(
+                api_key=self.api_key,
+                base_url=f"{self.endpoint}/openai/v1/"
+            )
+        except Exception as e:
+            raise RuntimeError(f"Failed to initialize Azure OpenAI client: {e}")
         
         print(f"✅ Initialized Azure OpenAI client")
         print(f"   Endpoint: {self.endpoint}")
@@ -452,25 +498,120 @@ Examples:
         help='Override model selection (default: gpt-5-chat for best analysis)'
     )
     
-    args = parser.parse_args()
+    try:
+        args = parser.parse_args()
+    except SystemExit:
+        sys.exit(1)
     
     try:
-        analyzer = PCAPAIAnalyzer(args.dir, model_override=args.model)
+        # Validate inputs
+        if not args.dir:
+            print("❌ Error: Analysis directory not specified", file=sys.stderr)
+            sys.exit(1)
         
-        if args.compare:
-            analyzer.compare_analyses(args.compare)
-        else:
-            analyzer.analyze(
-                focus=args.focus,
-                save_output=not args.no_save
-            )
+        # Initialize analyzer with error handling
+        try:
+            print("="*60)
+            print("AI-POWERED PCAP ANALYSIS")
+            print("="*60)
+            print(f"Analysis Directory: {args.dir}")
+            print(f"Focus: {args.focus}")
+            print(f"Model: {args.model or 'gpt-5-chat (default)'}")
+            print()
             
+            analyzer = PCAPAIAnalyzer(args.dir, model_override=args.model)
+            
+        except FileNotFoundError as e:
+            print(f"\n❌ Error: {e}", file=sys.stderr)
+            sys.exit(1)
+        except NotADirectoryError as e:
+            print(f"\n❌ Error: {e}", file=sys.stderr)
+            sys.exit(1)
+        except PermissionError as e:
+            print(f"\n❌ Error: {e}", file=sys.stderr)
+            sys.exit(1)
+        except ValueError as e:
+            print(f"\n❌ Error: {e}", file=sys.stderr)
+            print("\nTip: Check your .env file or environment variables:", file=sys.stderr)
+            print("  - AZURE_OPENAI_ENDPOINT", file=sys.stderr)
+            print("  - AZURE_OPENAI_API_KEY", file=sys.stderr)
+            sys.exit(1)
+        except RuntimeError as e:
+            print(f"\n❌ Error: {e}", file=sys.stderr)
+            sys.exit(1)
+        
+        # Perform analysis or comparison
+        try:
+            if args.compare:
+                # Validate comparison files
+                if not args.compare:
+                    print("❌ Error: No comparison files specified", file=sys.stderr)
+                    sys.exit(1)
+                
+                missing_files = [f for f in args.compare if not os.path.exists(f)]
+                if missing_files:
+                    print(f"❌ Error: Comparison files not found:", file=sys.stderr)
+                    for f in missing_files:
+                        print(f"  - {f}", file=sys.stderr)
+                    sys.exit(1)
+                
+                analyzer.compare_analyses(args.compare)
+            else:
+                analyzer.analyze(
+                    focus=args.focus,
+                    save_output=not args.no_save
+                )
+            
+            print("\n✅ Analysis complete!")
+            sys.exit(0)
+            
+        except ConnectionError as e:
+            print(f"\n❌ Error: Cannot connect to Azure OpenAI: {e}", file=sys.stderr)
+            print("  Check your network connection and endpoint URL", file=sys.stderr)
+            sys.exit(1)
+        except TimeoutError as e:
+            print(f"\n❌ Error: Request timed out: {e}", file=sys.stderr)
+            print("  The API may be overloaded or your network is slow", file=sys.stderr)
+            sys.exit(1)
+        except MemoryError:
+            print(f"\n❌ Error: Out of memory", file=sys.stderr)
+            print("  Try using a smaller focus area or reducing the data size", file=sys.stderr)
+            sys.exit(1)
+        except Exception as e:
+            error_msg = str(e).lower()
+            if "authentication" in error_msg or "unauthorized" in error_msg or "401" in error_msg:
+                print(f"\n❌ Error: Authentication failed: {e}", file=sys.stderr)
+                print("  Check your AZURE_OPENAI_API_KEY", file=sys.stderr)
+                sys.exit(1)
+            elif "rate limit" in error_msg or "429" in error_msg:
+                print(f"\n❌ Error: Rate limit exceeded: {e}", file=sys.stderr)
+                print("  Wait a moment and try again", file=sys.stderr)
+                sys.exit(1)
+            elif "quota" in error_msg:
+                print(f"\n❌ Error: Quota exceeded: {e}", file=sys.stderr)
+                print("  Check your Azure OpenAI quota and billing", file=sys.stderr)
+                sys.exit(1)
+            else:
+                print(f"\n❌ Error during analysis: {e}", file=sys.stderr)
+                import traceback
+                traceback.print_exc()
+                sys.exit(1)
+            
+    except KeyboardInterrupt:
+        print("\n\n❌ Operation cancelled by user", file=sys.stderr)
+        sys.exit(130)
     except Exception as e:
-        print(f"❌ Fatal error: {e}")
+        print(f"\n❌ Unexpected error: {e}", file=sys.stderr)
         import traceback
         traceback.print_exc()
         sys.exit(1)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except SystemExit:
+        raise
+    except Exception as e:
+        print(f"❌ Fatal error: {e}", file=sys.stderr)
+        sys.exit(1)
