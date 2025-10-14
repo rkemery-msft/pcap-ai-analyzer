@@ -148,6 +148,9 @@ python analyze_with_ai.py --dir ai_analysis/ --focus dns
 # Use gpt-5-chat model (recommended for consistent output)
 python analyze_with_ai.py --dir ai_analysis/ --model gpt-5-chat
 
+# Use gpt-5 for balanced reasoning (moderate processing time)
+python analyze_with_ai.py --dir ai_analysis/ --focus errors --model gpt-5
+
 # Use gpt-5-mini for detailed reasoning (longer processing time)
 python analyze_with_ai.py --dir ai_analysis/ --focus errors --model gpt-5-mini
 ```
@@ -160,6 +163,7 @@ python analyze_with_ai.py --dir ai_analysis/ --focus errors --model gpt-5-mini
 
 **Model Selection:**
 - **gpt-5-chat**: Fast, consistent, recommended for all scenarios
+- **gpt-5**: Balanced reasoning model, good compromise between speed and depth
 - **gpt-5-mini**: Detailed reasoning, best with specific focus areas (errors, performance, dns)
 
 ## 🔧 Configuration
@@ -177,11 +181,13 @@ AZURE_OPENAI_API_VERSION=2024-02-01
 # Model Deployment Names
 # Use your actual Azure OpenAI deployment names
 GPT_5_CHAT_MODEL=gpt-5-chat    # Recommended: Fast, consistent output
+GPT_5_MODEL=gpt-5              # Optional: Balanced reasoning model
 GPT_5_MINI_MODEL=gpt-5-mini    # Optional: Detailed reasoning (slower)
 ```
 
 **Model Information:**
 - **gpt-5-chat** (128K context): Standard chat model optimized for fast, consistent analysis. **Recommended for most users.**
+- **gpt-5** (128K context): Balanced reasoning model with moderate processing time. Good compromise between speed and analytical depth.
 - **gpt-5-mini** (400K context): Reasoning model with extended thinking capabilities. Use for complex technical deep-dives with specific focus areas.
 
 ### Advanced Options
@@ -274,6 +280,13 @@ Priority Actions:
   - Fast response time (typically 10-30 seconds)
   - Cost-effective at ~$0.001-$0.01 per typical capture
   - **Best for production use**
+
+- **gpt-5** (Balanced): Reasoning model ($1.25 input / $10.00 output per 1M tokens)
+  - 128K context window
+  - Moderate reasoning capabilities with good output quality
+  - Medium response time (30-60 seconds)
+  - Similar pricing to gpt-5-chat but with reasoning tokens
+  - **Good compromise between speed and analytical depth**
 
 - **gpt-5-mini** (Alternative): Reasoning model ($0.50 input / $2.00 output per 1M tokens)
   - 400K context window (272K input / 128K output)
@@ -406,10 +419,13 @@ pip install scapy
 
 **"AI model returns no content" or "slow responses"**
 - **Recommended:** Use `--model gpt-5-chat` for fast, consistent responses
+- **gpt-5:** Balanced reasoning model (30-60 sec) with good analytical depth
+  - Works well with all focus areas
+  - Good compromise between speed and reasoning quality
 - **gpt-5-mini:** Takes longer (30-90 sec) as it uses extended reasoning
   - Best with specific focus: `--focus errors`, `--focus performance`, or `--focus dns`
   - Avoid general focus with large datasets when using gpt-5-mini
-  - If you see empty output, try gpt-5-chat instead
+  - If you see empty output, try gpt-5-chat or gpt-5 instead
 
 ### Virtual Environment Creation Fails
 

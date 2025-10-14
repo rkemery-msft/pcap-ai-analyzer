@@ -15,12 +15,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cleaned up redundant files
 - Updated file path references in README and documentation
 
+### Added
+- **gpt-5 model support** with optimized configuration
+  - Increased `max_completion_tokens` to 16000 for comprehensive reasoning output
+  - Balanced reasoning model between gpt-5-chat (fast) and gpt-5-mini (detailed)
+  - Added documentation for gpt-5 usage and pricing
+  - Works well with all focus areas
+
 ### Improved
-- Enhanced gpt-5-mini reasoning model support
-  - Increased `max_completion_tokens` from 4000 to 8000 for more comprehensive output
+- Enhanced reasoning model support (gpt-5, gpt-5-mini, gpt-5-pro)
+  - Increased `max_completion_tokens` from 8000 to 16000 for gpt-5 models
   - Added `reasoning_effort: medium` parameter for better quality analysis
   - Significantly improved output consistency for complex prompts
-  - gpt-5-mini now produces detailed analysis for general focus areas
+  - All reasoning models now produce detailed analysis consistently
 - Better error messages when reasoning models return empty content
   - Detects reasoning token usage and provides helpful guidance
   - Suggests alternative models and focus areas
