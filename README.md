@@ -14,6 +14,36 @@ AI-powered network packet capture analyzer for Kubernetes/Azure networking. Sani
 - **🎯 Kubernetes-Optimized**: Specialized detection for AKS/K8s networking issues
 - **📈 Actionable Insights**: Generates prioritized troubleshooting steps with evidence
 
+## ⚠️ Security & Privacy Disclaimer
+
+**This tool provides best-effort sanitization for common protocols. Always review output before external sharing.**
+
+### ✅ What Sanitization DOES:
+- Anonymizes IP/MAC addresses to reserved ranges (RFC 5737, RFC 1918)
+- Removes HTTP headers (cookies, authorization, API keys)
+- Sanitizes DNS queries and common PII patterns
+- Preserves network behavior for troubleshooting
+
+### ⚠️ What Sanitization DOES NOT Do:
+- **Cannot decrypt TLS/SSL encrypted traffic** (encrypted payloads remain encrypted)
+- **Only handles common protocols** (HTTP, DNS, TCP/IP - custom protocols may leak data)
+- **Not 100% guaranteed** (obfuscated or custom data formats may not be detected)
+- **Not a compliance-only solution** (GDPR/HIPAA/PCI-DSS require additional validation)
+
+### 🔒 Best Practices:
+1. **Always manually review** sanitized files before sharing externally
+2. **Test on a sample** before processing large datasets
+3. **Use full packet capture** (no snaplen truncation) for sensitive data
+4. **Combine with organizational security policies** (access controls, encryption at rest)
+5. **Document your review process** for audit trails
+
+📋 **Detailed Testing:** See [SANITIZATION_TEST_REPORT.md](./SANITIZATION_TEST_REPORT.md) for accuracy validation results.
+
+**Recommended Use:** Internal troubleshooting, team collaboration, support cases (with review)  
+**Requires Extra Review:** External vendor sharing, compliance-regulated data, public release
+
+---
+
 ## 🚀 Quick Start
 
 ### Prerequisites
