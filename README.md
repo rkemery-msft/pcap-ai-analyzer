@@ -165,6 +165,7 @@ python analyze_with_ai.py --dir ai_analysis/ --focus errors --model gpt-5-mini
 - **gpt-5-chat**: Fast, consistent, recommended for all scenarios
 - **gpt-5**: Balanced reasoning model, good compromise between speed and depth
 - **gpt-5-mini**: Detailed reasoning, best with specific focus areas (errors, performance, dns)
+- **gpt-5-pro**: Not recommended - requires responses API, very long processing times (60-120+ seconds), limited output visibility
 
 ## 🔧 Configuration
 
@@ -295,6 +296,12 @@ Priority Actions:
   - Slightly higher cost due to reasoning tokens
   - Excellent for detailed technical deep-dives
   - **Use for specific focus areas** (errors, performance, dns)
+
+- **gpt-5-pro** (Not Recommended): Advanced reasoning model
+  - Requires different API (responses instead of chat completions)
+  - Very long processing time (60-120+ seconds for simple requests)
+  - Limited output visibility in current implementation
+  - **Not currently supported by this tool**
 
 **Important Notes:** 
 - Costs shown are for AI analysis only using Global deployment (East US pricing)
