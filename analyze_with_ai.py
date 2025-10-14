@@ -303,11 +303,13 @@ Be specific and reference actual data from the capture."""
             }
             
             # Reasoning models (gpt-5, gpt-5-mini, gpt-5-pro) require max_completion_tokens
+            # Note: Some reasoning models may not produce visible output consistently
             if 'gpt-5-mini' in self.model or 'gpt-5-pro' in self.model or self.model == 'gpt-5':
-                kwargs["max_completion_tokens"] = 3000
+                kwargs["max_completion_tokens"] = 4000  # Increased for better output
+                # Don't set temperature for reasoning models - they handle it internally
             else:
                 # Chat models use max_tokens and support temperature
-                kwargs["max_tokens"] = 3000
+                kwargs["max_tokens"] = 4000  # Increased for detailed analysis
                 kwargs["temperature"] = 0.7
             
             response = self.client.chat.completions.create(**kwargs)
@@ -316,13 +318,41 @@ Be specific and reference actual data from the capture."""
             content = response.choices[0].message.content
             
             # Handle reasoning models that might not return visible content
-            if not content:
+            if not content or content.strip() == "":
+                # Check if this is a reasoning model with hidden reasoning
                 if (response.usage and 
                     hasattr(response.usage, 'completion_tokens_details') and
                     response.usage.completion_tokens_details and
-                    hasattr(response.usage.completion_tokens_details, 'reasoning_tokens')):
+                    hasattr(response.usage.completion_tokens_details, 'reasoning_tokens') and
+                    response.usage.completion_tokens_details.reasoning_tokens > 0):
                     reasoning_tokens = response.usage.completion_tokens_details.reasoning_tokens
-                    content = f"⚠️ Model used {reasoning_tokens} reasoning tokens but returned no visible content. This may indicate the analysis was too complex. Try with a more specific focus."
+                    content = f"""⚠️ **Reasoning Model Output Issue**
+
+The model ({self.model}) used {reasoning_tokens:,} reasoning tokens during processing, but did not return visible analysis content.
+
+**Possible Solutions:**
+1. Try using `--model gpt-5-chat` for consistent output
+2. Use a more specific focus: `--focus errors` or `--focus dns`
+3. Reduce the complexity of the data being analyzed
+4. Check if the model deployment supports visible output
+
+**Note:** Some reasoning models may process internally without generating visible text. The gpt-5-chat model is recommended for reliable PCAP analysis."""
+                else:
+                    # Model returned empty content without reasoning tokens
+                    content = f"""⚠️ **Empty Model Response**
+
+The model ({self.model}) returned no content.
+
+**Possible Solutions:**
+1. Try using `--model gpt-5-chat` (recommended)
+2. Verify your Azure OpenAI deployment is configured correctly
+3. Check if the model has sufficient quota
+4. Try with a simpler focus area: `--focus errors`
+
+**Debug Info:**
+- Model: {self.model}
+- Prompt tokens: {response.usage.prompt_tokens if response.usage else 'N/A'}
+- Completion tokens: {response.usage.completion_tokens if response.usage else 'N/A'}"""
             
             # Get usage stats
             usage = {
