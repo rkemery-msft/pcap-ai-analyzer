@@ -8,12 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0] - 2025-10-14
 
 ### Fixed
+- **Corrected gpt-5 context window in README.md**
+  - Updated from incorrect 128K to correct 400K context window (272K input / 128K output)
+  - Verified against Microsoft Azure OpenAI documentation
+  - All GPT-5 reasoning models (gpt-5, gpt-5-mini) have 400K context, only gpt-5-chat has 128K
 - **Corrected gpt-5-mini pricing in README.md**
   - Updated input pricing from $0.50 to $0.25 per 1M tokens (50% reduction)
   - Aligned with GPT5_PRICING_REFERENCE.md which had correct pricing
   - Validated through comprehensive Azure OpenAI testing
   - Users now have accurate cost information showing gpt-5-mini is 5x cheaper than gpt-5-chat
-  - See `/tmp/pricing-validation-test/PRICING_VALIDATION_REPORT.md` for full analysis
+  - See `docs/PRICING_VALIDATION_REPORT.md` for full analysis
+- **Improved accuracy of model capability descriptions**
+  - Changed gpt-5 from "moderate reasoning" to "full reasoning capabilities"
+  - Added disclaimers that response times vary by workload
+  - Clarified that gpt-5 and gpt-5-mini have identical reasoning capabilities
+  - Updated "best for production" to "recommended for production PCAP analysis"
 
 ### Changed
 - Reorganized repository structure for better navigation

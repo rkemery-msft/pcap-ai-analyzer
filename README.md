@@ -275,24 +275,24 @@ Priority Actions:
 **Model Information:**
 
 - **gpt-5-chat** (Recommended): Standard chat model ($1.25 input / $10.00 output per 1M tokens)
-  - 128K context window
+  - 128K context window, 16K max output tokens
   - Consistent, reliable output across all scenarios
-  - Fast response time (typically 10-30 seconds)
+  - Fast response time (typically 10-30 seconds, varies by workload)
   - Cost-effective at ~$0.001-$0.01 per typical capture
-  - **Best for production use**
+  - **Recommended for production PCAP analysis** (optimal speed/cost balance)
 
 - **gpt-5** (Balanced): Reasoning model ($1.25 input / $10.00 output per 1M tokens)
-  - 128K context window
-  - Moderate reasoning capabilities with good output quality
-  - Medium response time (30-60 seconds)
+  - 400K context window (272K input / 128K output)
+  - Full reasoning capabilities (same as gpt-5-mini)
+  - Medium response time (30-60 seconds, varies by workload)
   - Similar pricing to gpt-5-chat but with reasoning tokens
   - **Good compromise between speed and analytical depth**
 
 - **gpt-5-mini** (Alternative): Reasoning model ($0.25 input / $2.00 output per 1M tokens)
-  - 400K context window (272K input / 128K output)
+  - 400K context window (272K input / 128K output), 128K max output tokens
   - Uses extended reasoning for complex analysis
-  - Longer response time (30-90 seconds)
-  - Lower cost than gpt-5-chat (50% less input cost)
+  - Longer response time (30-90 seconds, varies by workload)
+  - Lower cost than gpt-5-chat (5x cheaper for same token usage)
   - Excellent for detailed technical deep-dives
   - **Use for specific focus areas** (errors, performance, dns)
 

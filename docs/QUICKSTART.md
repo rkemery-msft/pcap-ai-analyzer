@@ -217,9 +217,9 @@ python sanitize_pcap.py --input capture.cap
 ### Model Selection
 
 **Recommended Model:**
-- `gpt-5-chat` (128K context) - Excellent quality, reliable output, detailed analysis
-- `gpt-5` (400K context) - Base reasoning model (uses reasoning tokens, may not show visible output)
-- `gpt-5-pro` (400K context) - Pro reasoning model (Responses API only, requires registration)
+- `gpt-5-chat` (128K context) - Fast, reliable output, recommended for production
+- `gpt-5` (400K context) - Full reasoning model (balanced speed/depth)
+- `gpt-5-mini` (400K context) - Cost-effective reasoning model (5x cheaper than gpt-5-chat)
 
 ## Quick Reference
 
