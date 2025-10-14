@@ -15,6 +15,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cleaned up redundant files
 - Updated file path references in README and documentation
 
+### Improved
+- Enhanced gpt-5-mini reasoning model support
+  - Increased `max_completion_tokens` from 4000 to 8000 for more comprehensive output
+  - Added `reasoning_effort: medium` parameter for better quality analysis
+  - Significantly improved output consistency for complex prompts
+  - gpt-5-mini now produces detailed analysis for general focus areas
+- Better error messages when reasoning models return empty content
+  - Detects reasoning token usage and provides helpful guidance
+  - Suggests alternative models and focus areas
+  - Includes troubleshooting steps
+
 ### Removed
 - Redundant testing report files
 

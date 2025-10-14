@@ -303,9 +303,12 @@ Be specific and reference actual data from the capture."""
             }
             
             # Reasoning models (gpt-5, gpt-5-mini, gpt-5-pro) require max_completion_tokens
-            # Note: Some reasoning models may not produce visible output consistently
+            # and support reasoning_effort parameter for better output quality
             if 'gpt-5-mini' in self.model or 'gpt-5-pro' in self.model or self.model == 'gpt-5':
-                kwargs["max_completion_tokens"] = 4000  # Increased for better output
+                kwargs["max_completion_tokens"] = 8000  # Increased significantly for reasoning models
+                # Set reasoning_effort to encourage comprehensive visible output
+                # Options: minimal, low, medium, high (default: medium for balance)
+                kwargs["reasoning_effort"] = "medium"  # Balance between speed and quality
                 # Don't set temperature for reasoning models - they handle it internally
             else:
                 # Chat models use max_tokens and support temperature
