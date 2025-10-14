@@ -137,7 +137,7 @@ python prepare_for_ai_analysis.py \
 Generate intelligent troubleshooting recommendations:
 
 ```bash
-# General comprehensive analysis
+# General comprehensive analysis (gpt-5-chat recommended)
 python analyze_with_ai.py --dir ai_analysis/
 
 # Focus on specific areas
@@ -145,15 +145,22 @@ python analyze_with_ai.py --dir ai_analysis/ --focus errors
 python analyze_with_ai.py --dir ai_analysis/ --focus performance
 python analyze_with_ai.py --dir ai_analysis/ --focus dns
 
-# Use gpt-5-chat model (recommended)
+# Use gpt-5-chat model (recommended for consistent output)
 python analyze_with_ai.py --dir ai_analysis/ --model gpt-5-chat
+
+# Use gpt-5-mini for detailed reasoning (longer processing time)
+python analyze_with_ai.py --dir ai_analysis/ --focus errors --model gpt-5-mini
 ```
 
 **Analysis Focus Areas:**
-- `general` - Comprehensive overview (default)
+- `general` - Comprehensive overview (default, use with gpt-5-chat)
 - `errors` - Deep dive into failures and issues
 - `performance` - Network performance and optimization
 - `dns` - DNS-specific troubleshooting
+
+**Model Selection:**
+- **gpt-5-chat**: Fast, consistent, recommended for all scenarios
+- **gpt-5-mini**: Detailed reasoning, best with specific focus areas (errors, performance, dns)
 
 ## 🔧 Configuration
 
@@ -168,12 +175,14 @@ AZURE_OPENAI_API_KEY=your-api-key-here
 AZURE_OPENAI_API_VERSION=2024-02-01
 
 # Model Deployment Names
-# Note: Use your actual Azure OpenAI deployment names
-# GPT-5-chat is the recommended model for analysis
-GPT_5_CHAT_MODEL=gpt-5-chat    # Your chat model deployment name
+# Use your actual Azure OpenAI deployment names
+GPT_5_CHAT_MODEL=gpt-5-chat    # Recommended: Fast, consistent output
+GPT_5_MINI_MODEL=gpt-5-mini    # Optional: Detailed reasoning (slower)
 ```
 
-**Model Information:** GPT-5 is an advanced reasoning model series from Azure OpenAI. The `gpt-5-chat` model (128K context) is optimized for conversational tasks and detailed analysis. Use the deployment name configured in your Azure OpenAI resource.
+**Model Information:**
+- **gpt-5-chat** (128K context): Standard chat model optimized for fast, consistent analysis. **Recommended for most users.**
+- **gpt-5-mini** (400K context): Reasoning model with extended thinking capabilities. Use for complex technical deep-dives with specific focus areas.
 
 ### Advanced Options
 
@@ -250,18 +259,29 @@ Priority Actions:
 
 ### Azure OpenAI GPT-5 Pricing (Global Deployment)
 
-| File Size | Tokens | gpt-5-chat | Processing Time |
-|-----------|--------|------------|------------------|
-| 100 MB    | ~2,000 | **$0.0025** | 20-30 min |
-| 500 MB    | ~7,000 | **$0.0094** | 60-90 min |
-| 1 GB      | ~13,000| **$0.0175** | 90-120 min |
-| 5 GB      | ~35,000 | **$0.0938** | 60-90 min |
+| File Size | Tokens | gpt-5-chat Cost |
+|-----------|--------|-----------------|
+| 100 MB    | ~2,000 | **$0.0025** |
+| 500 MB    | ~7,000 | **$0.0094** |
+| 1 GB      | ~13,000| **$0.0175** |
+| 5 GB      | ~35,000 | **$0.0938** |
 
 **Model Information:**
-- **gpt-5-chat**: Recommended model ($1.25 input / $10.00 output per 1M tokens)
+
+- **gpt-5-chat** (Recommended): Standard chat model ($1.25 input / $10.00 output per 1M tokens)
   - 128K context window
-  - Provides detailed analysis with narratives
+  - Consistent, reliable output across all scenarios
+  - Fast response time (typically 10-30 seconds)
   - Cost-effective at ~$0.001-$0.01 per typical capture
+  - **Best for production use**
+
+- **gpt-5-mini** (Alternative): Reasoning model ($0.50 input / $2.00 output per 1M tokens)
+  - 400K context window (272K input / 128K output)
+  - Uses extended reasoning for complex analysis
+  - Longer response time (30-90 seconds)
+  - Slightly higher cost due to reasoning tokens
+  - Excellent for detailed technical deep-dives
+  - **Use for specific focus areas** (errors, performance, dns)
 
 **Important Notes:** 
 - Costs shown are for AI analysis only using Global deployment (East US pricing)
@@ -384,10 +404,12 @@ pip install scapy
   ```
 - Increase system memory or use a machine with more RAM
 
-**"AI model returns no content"**
-- Some reasoning models may not return visible output consistently
-- Use `--model gpt-5-chat` for consistent responses (recommended)
-- Reduce prompt complexity with `--focus errors` or `--focus dns`
+**"AI model returns no content" or "slow responses"**
+- **Recommended:** Use `--model gpt-5-chat` for fast, consistent responses
+- **gpt-5-mini:** Takes longer (30-90 sec) as it uses extended reasoning
+  - Best with specific focus: `--focus errors`, `--focus performance`, or `--focus dns`
+  - Avoid general focus with large datasets when using gpt-5-mini
+  - If you see empty output, try gpt-5-chat instead
 
 ### Virtual Environment Creation Fails
 
