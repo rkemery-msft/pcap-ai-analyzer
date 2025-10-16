@@ -2,6 +2,18 @@
 
 Get started with PCAP AI Analyzer in 5 minutes!
 
+## ⚠️ NON-PRODUCTION TOOL DISCLAIMER
+
+**This tool is provided for educational, testing, and non-production troubleshooting purposes only.**
+
+- ❌ NOT production-ready - Experimental troubleshooting tool
+- ✅ Use for: Development, testing, learning, internal analysis
+- ⚠️ AI Analysis: Requires explicit consent before data submission
+
+See main README.md for complete disclaimer.
+
+---
+
 ## Prerequisites
 
 - Python 3.8 or higher

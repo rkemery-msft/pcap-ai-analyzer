@@ -4,9 +4,20 @@
 **Tool:** pcap-ai-analyzer/sanitize_pcap.py  
 **Test Methodology:** Automated accuracy validation on representative PCAP samples
 
+## ⚠️ NON-PRODUCTION TOOL DISCLAIMER
+
+**This tool is provided for educational, testing, and non-production purposes only.**
+
+- ❌ NOT production-ready or enterprise-certified
+- ❌ NOT a compliance solution for GDPR, HIPAA, PCI-DSS
+- ✅ Use for: Testing, development, learning, internal troubleshooting
+- ⚠️ Manual review required: Always verify sanitization before sharing data
+
+---
+
 ## Test Summary
 
-✅ **PASSED** - Sanitization performs as expected with documented limitations
+✅ **PASSED** - Sanitization performs as expected for non-production testing with documented limitations
 
 ---
 

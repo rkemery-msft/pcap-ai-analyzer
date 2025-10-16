@@ -5,6 +5,41 @@ AI-powered network packet capture analyzer for troubleshooting network issues. S
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)]
 
+---
+
+## ⚠️ NON-PRODUCTION TOOL DISCLAIMER
+
+**This tool is provided for educational, testing, and non-production troubleshooting purposes only.**
+
+- ❌ **NOT intended for production deployment** - Experimental troubleshooting tool
+- ❌ **NOT production-ready** - No enterprise support, SLA, or warranty
+- ❌ **NOT compliance-certified** - Does not guarantee GDPR, HIPAA, or PCI-DSS compliance alone
+- ✅ **Use for**: Development, testing, learning, internal troubleshooting, pattern analysis
+- ✅ **Appropriate for**: Non-production environments, sanitized data analysis, research
+
+**By using this tool, you acknowledge that:**
+1. You understand its limitations and experimental nature
+2. You will validate outputs before sharing with any party
+3. You will not use it as a sole compliance solution
+4. You take full responsibility for data handling and sharing decisions
+5. You have proper authorization for any AI data submissions
+
+---
+
+## 🤖 AI DATA SUBMISSION & PRIVACY NOTICE
+
+**When using AI analysis features, you will be prompted for consent before data submission.**
+
+This tool can send sanitized PCAP analysis data to Azure OpenAI. Before proceeding:
+- ✓ Verify PCAP data is properly sanitized
+- ✓ Obtain authorization to submit data to Azure OpenAI services
+- ✓ Review your organization's data sharing policies
+- ✓ Understand data will be processed per [Azure OpenAI Service terms](https://azure.microsoft.com/support/legal/cognitive-services-openai-terms/)
+
+**Interactive consent prompt** is displayed before any AI submission. See `analyze_with_ai.py` for details.
+
+---
+
 ## 🎯 Features
 
 - **🔒 PII Sanitization**: Anonymizes IP addresses, MAC addresses, DNS queries, HTTP headers, emails, and API keys

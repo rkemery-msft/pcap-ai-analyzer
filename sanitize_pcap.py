@@ -1,7 +1,16 @@
 #!/usr/bin/env python3
 """
 PCAP Sanitization Script
+
+⚠️ NON-PRODUCTION TOOL - For testing, development, and learning purposes only.
+
 Removes PII and customer information from packet capture files while preserving traffic patterns.
+
+This is an experimental tool for non-production use:
+- ❌ NOT production-ready or enterprise-certified
+- ❌ NOT a compliance solution (GDPR, HIPAA, PCI-DSS)
+- ✅ Use for: Testing, development, internal troubleshooting, learning
+- ⚠️ Manual review required: Always verify outputs before sharing
 
 Sanitizes:
 - IP addresses (consistent anonymization)

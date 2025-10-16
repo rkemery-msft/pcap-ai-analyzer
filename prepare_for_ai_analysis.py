@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """
 PCAP to AI-Optimized Analysis Format
+
+⚠️ NON-PRODUCTION TOOL - For testing, development, and learning purposes only.
+
 Converts packet capture files into structured, token-efficient formats for AI analysis.
 
 This script extracts and organizes PCAP data into digestible chunks that are:
@@ -10,6 +13,9 @@ This script extracts and organizes PCAP data into digestible chunks that are:
 - Prioritized (focuses on errors and anomalies)
 
 Perfect for feeding to Azure OpenAI GPT-5 models or other LLMs for troubleshooting.
+
+IMPORTANT: This script prepares data for AI submission. Review the AI data privacy
+disclaimer in analyze_with_ai.py before proceeding to AI analysis.
 """
 
 import os

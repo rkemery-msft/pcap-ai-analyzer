@@ -2,8 +2,44 @@
 """
 AI-Powered PCAP Analysis using GPT-5-chat (Azure OpenAI)
 
+⚠️ NON-PRODUCTION TOOL - For testing, development, and learning purposes only.
+⚠️ AI DATA PRIVACY WARNING - See disclaimer below before use.
+
 This script analyzes the prepared PCAP analysis data using Azure OpenAI's GPT-5-chat model
 to provide intelligent insights into network issues, errors, and troubleshooting steps.
+
+═══════════════════════════════════════════════════════════════════════════════
+⚠️  AI DATA SUBMISSION & PRIVACY DISCLAIMER
+═══════════════════════════════════════════════════════════════════════════════
+
+BY USING THIS SCRIPT, YOU ACKNOWLEDGE AND ACCEPT:
+
+1. DATA TRANSMISSION: This script sends sanitized PCAP analysis data to Azure
+   OpenAI services for AI-powered analysis.
+
+2. DATA PRIVACY: Even though PCAPs are sanitized, you are responsible for:
+   - Verifying sanitization was successful
+   - Ensuring no customer-identifiable information remains
+   - Complying with your organization's data sharing policies
+   - Understanding Azure OpenAI's data processing and retention policies
+
+3. AZURE OPENAI TERMS: Data sent to Azure OpenAI is subject to Microsoft's
+   Azure OpenAI Service terms and data processing agreements. Review:
+   - https://azure.microsoft.com/en-us/support/legal/cognitive-services-openai-terms/
+   - Your organization's Azure subscription terms
+
+4. NOT FOR REGULATED DATA: Do not use this tool with:
+   - Unsanitized customer production data
+   - Data subject to strict regulatory requirements (HIPAA, PCI-DSS, etc.)
+   - Confidential business data without proper approval
+
+5. EXPERIMENTAL TOOL: This is a non-production troubleshooting aid, not a
+   production-ready enterprise solution.
+
+USER CONSENT REQUIRED: You must have explicit authorization to submit data
+to external AI services before running this script.
+
+═══════════════════════════════════════════════════════════════════════════════
 """
 
 import os
@@ -475,6 +511,31 @@ Analyses:
 
 
 def main():
+    # Display privacy disclaimer and require consent
+    print("\n" + "="*80)
+    print("⚠️  AI DATA SUBMISSION & PRIVACY CONSENT")
+    print("="*80)
+    print("""
+This script will send sanitized PCAP analysis data to Azure OpenAI for AI analysis.
+
+BEFORE PROCEEDING, CONFIRM:
+  ✓ You have verified the PCAP data is properly sanitized
+  ✓ You have authorization to submit data to Azure OpenAI services
+  ✓ You understand data will be processed by Microsoft Azure OpenAI
+  ✓ You have reviewed your organization's data sharing policies
+  ✓ You accept this is a non-production troubleshooting tool
+
+See full disclaimer at the top of this script for details.
+""")
+    
+    consent = input("Do you consent to submit data to Azure OpenAI for analysis? (yes/no): ").strip().lower()
+    if consent not in ['yes', 'y']:
+        print("\n❌ User did not consent. Exiting without submitting data.")
+        print("   To proceed, run again and type 'yes' when prompted.\n")
+        sys.exit(0)
+    
+    print("\n✅ User consent recorded. Proceeding with analysis...\n")
+    
     parser = argparse.ArgumentParser(
         description="AI-Powered PCAP Analysis using Azure OpenAI GPT-5-chat",
         formatter_class=argparse.RawDescriptionHelpFormatter,
