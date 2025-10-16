@@ -1,5 +1,16 @@
 # Error Handling Documentation
 
+## ⚠️ NON-PRODUCTION TOOL DISCLAIMER
+
+**This documentation describes error handling for experimental troubleshooting tools.**
+
+- ❌ NOT production-ready - For testing and development use
+- ✅ Use for: Learning, development, internal troubleshooting
+
+See main README.md for complete disclaimer.
+
+---
+
 ## Overview
 
 The pcap-ai-analyzer tools include error handling for common failure scenarios. This document describes error types, their meanings, and troubleshooting steps.

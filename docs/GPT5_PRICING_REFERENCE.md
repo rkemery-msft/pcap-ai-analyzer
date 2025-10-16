@@ -1,5 +1,16 @@
 # GPT-5 Pricing Reference (Azure OpenAI)
 
+## ⚠️ NON-PRODUCTION TOOL DISCLAIMER
+
+**This pricing reference is for experimental AI analysis tools.**
+
+- ❌ NOT production-ready - For testing and development use
+- ⚠️ AI Analysis requires explicit user consent for data submission
+
+See main README.md for complete disclaimer.
+
+---
+
 **Source:** [Azure OpenAI Service Pricing](https://azure.microsoft.com/en-us/pricing/details/cognitive-services/openai-service/) (East US Region, as of October 2025)
 
 **Recommended Model:** gpt-5-chat - Best balance of quality, reliability, and cost for PCAP analysis.
